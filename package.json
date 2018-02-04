@@ -1,0 +1,18 @@
+{
+  "name": "kagebunshin",
+  "version": "1.0.0",
+  "description": "Serverless image resizer with AWS S3 Reduced Redundancy Storage",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Vic-L/kagebunshin.git"
+  },
+  "author": "Vic-L",
+  "license": "MIT",
+  "devDependencies": {
+    "serverless-offline": "^3.16.0"
+  }
+}
