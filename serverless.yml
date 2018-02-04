@@ -1,7 +1,7 @@
 custom: 
   service: ${file(env.yml):service}
   provider: ${file(env.yml):provider}
-  s3: ${file(env.yml):provider}
+  s3: ${file(env.yml):s3}
   serverless-offline:
     port: 8000
 
@@ -18,16 +18,20 @@ provider:
   stage: ${opt:stage, 'dev'} # `sls deploy --stage production` if --stage is provided, else use dev
   stackTags: # Optional CF stack tags
     Name: ${self:custom.provider.awsTagName}
+  environment:
+    DST_BUCKET_NAME: ${self:custom.s3.${opt:stage, 'dev'}DstBucketName}
+    S3_ACCESS_KEY_ID: ${self:custom.s3.${opt:stage, 'dev'}AccessKeyId}
+    S3_SECRET_ACCESS_KEY: ${self:custom.s3.${opt:stage, 'dev'}SecretAccessKey}
 
 functions:
-  resize:
-    handler: handler.resize
+  onUpload:
+    handler: handler.onUpload
     tags:
       Name: ${self:custom.provider.awsTagName}
     events:
       - http:
-          path: '/'
-          method: get
+          path: '/onUpload'
+          method: post
           cors: true
 
 plugins:
