@@ -14,7 +14,12 @@ module.exports.onUpload = (event, context, callback) => {
     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
   })
 
-  const srcS3 = JSON.parse(event.body).Records[0].s3
+  //** event.body is used for debugging in sls offline 
+  //** event is a string when debugging using postman
+  //** event is a JSON when triggered by an S3 event
+  
+  // const srcS3 = JSON.parse(event.body).Records[0].s3 // for dev in sls offline
+  const srcS3 = event.Records[0].s3 // in production with S3 event as input
   const srcBucketName = srcS3.bucket.name
   const srcKey = srcS3.object.key
 
