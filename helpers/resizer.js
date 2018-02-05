@@ -6,7 +6,7 @@ module.exports.resize = (inputImageBuffer, width, callback) => {
   .size(function (err, size) {
     if (err) callback(err)
 
-    this.resize(width, size.height / size.width * width) // maintain aspect ratio
+    this.resize(Math.min(width, size.width), size.height / size.width * Math.min(width, size.width)) // maintain aspect ratio
     .toBuffer(callback)
   });
 }
