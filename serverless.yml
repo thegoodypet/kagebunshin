@@ -13,7 +13,7 @@ provider:
   name: aws
   runtime: nodejs6.10
   region: ${self:custom.provider.region}
-  memorySize: 128
+  memorySize: ${self:custom.provider.memorySize}
   profile: ${self:custom.provider.awsProfile} # aws named profile
   stage: ${opt:stage, 'dev'} # `sls deploy --stage production` if --stage is provided, else use dev
   stackTags: # Optional CF stack tags
