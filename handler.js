@@ -1,10 +1,9 @@
 'use strict';
 
 var handleS3Error = require('./helpers/errors').handleS3Error
+var resize = require('./helpers/resizer').resize
 
 var AWS = require('aws-sdk');
-
-var gm = require('gm').subClass({imageMagick: true});
 
 module.exports.onUpload = (event, context, callback) => {
   var dstBucket = process.env.DST_BUCKET_NAME;
@@ -32,9 +31,10 @@ module.exports.onUpload = (event, context, callback) => {
   .promise()
   .then(function(data) {
 
-    gm(data.Body)
-    .resize(100, 100)
-    .toBuffer(function(err, buffer) {
+    const width = 100
+    const height = 100
+
+    resize(data.Body, width, height, function(err, buffer) {
       if (err) return callback(null, handleS3Error(err));
 
       const dstParams = {
