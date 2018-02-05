@@ -32,9 +32,8 @@ module.exports.onUpload = (event, context, callback) => {
   .then(function(data) {
 
     const width = 100
-    const height = 100
 
-    resize(data.Body, width, height, function(err, buffer) {
+    resize(data.Body, width, function(err, buffer) {
       if (err) return callback(null, handleS3Error(err));
 
       const dstParams = {
