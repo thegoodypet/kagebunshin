@@ -4,6 +4,8 @@ var handleS3Error = require('./helpers/errors').handleS3Error
 
 var AWS = require('aws-sdk');
 
+var gm = require('gm').subClass({imageMagick: true});
+
 module.exports.onUpload = (event, context, callback) => {
   var dstBucket = process.env.DST_BUCKET_NAME;
 
@@ -16,21 +18,43 @@ module.exports.onUpload = (event, context, callback) => {
   const srcBucketName = srcS3.bucket.name
   const srcKey = srcS3.object.key
 
-  var srcParams = {
+  const srcParams = {
     Bucket: srcBucketName,
     Key: srcKey
   }
 
-  s3.getObject(srcParams).promise()
+  s3.getObject(srcParams)
+  .promise()
   .then(function(data) {
-    const response = {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: data,
-      }),
-    };
 
-    callback(null, response);
+    gm(data.Body)
+    .resize(100, 100)
+    .toBuffer(function(err, buffer) {
+      if (err) return callback(null, handleS3Error(err));
+
+      const dstParams = {
+        Bucket: dstBucket,
+        Key: srcKey,
+        Body: buffer,
+        StorageClass: "REDUCED_REDUNDANCY",
+        ACL: "public-read",
+        ContentType: data.ContentType
+      }
+
+      s3.upload(dstParams).promise().then(function(data) {
+
+        const response = {
+          statusCode: 200,
+          body: JSON.stringify({
+            message: data,
+          }),
+        };
+
+        callback(null, response);
+      }).catch(function(err) {
+        callback(null, handleS3Error(err))
+      })
+    })
   }).catch(function(err) {
     callback(null, handleS3Error(err))
   })
