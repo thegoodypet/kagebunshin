@@ -28,11 +28,13 @@ functions:
     handler: handler.onUpload
     tags:
       Name: ${self:custom.provider.awsTagName}
-    events:
-      - http:
-          path: '/onUpload'
-          method: post
-          cors: true
+    ## only use events for testing on dev and local
+    ## in production this lambda should be used as a event listener on S3 bucket
+    # events:
+    #   - http:
+    #       path: '/onUpload'
+    #       method: post
+    #       cors: true
 
 plugins:
   - serverless-offline
