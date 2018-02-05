@@ -31,34 +31,40 @@ module.exports.onUpload = (event, context, callback) => {
   .promise()
   .then(function(data) {
 
-    const width = 100
+    const widths = [320, 400, 768, 1200]
 
-    resize(data.Body, width, function(err, buffer) {
-      if (err) return callback(null, handleS3Error(err));
+    widths.forEach(function(width) {
 
-      const dstParams = {
-        Bucket: dstBucket,
-        Key: srcKey,
-        Body: buffer,
-        StorageClass: "REDUCED_REDUNDANCY",
-        ACL: "public-read",
-        ContentType: data.ContentType
-      }
+      resize(data.Body, width, function(err, buffer) {
+        if (err) return callback(null, handleS3Error(err));
 
-      s3.upload(dstParams).promise().then(function(data) {
+        let dstKey = srcKey.replace(".", `_${width}.`) // add dimension to name of file
 
-        const response = {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: data,
-          }),
-        };
+        const dstParams = {
+          Bucket: dstBucket,
+          Key: dstKey,
+          Body: buffer,
+          StorageClass: "REDUCED_REDUNDANCY",
+          ACL: "public-read",
+          ContentType: data.ContentType
+        }
 
-        callback(null, response);
-      }).catch(function(err) {
-        callback(null, handleS3Error(err))
+        s3.upload(dstParams)
+        .promise()
+        .catch(function(err) {
+          callback(null, handleS3Error(err))
+        })
       })
     })
+
+    const response = {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Successfully resized",
+      }),
+    };
+
+    callback(null, response);
   }).catch(function(err) {
     callback(null, handleS3Error(err))
   })
