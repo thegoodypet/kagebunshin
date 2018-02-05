@@ -19,15 +19,15 @@
          "s3":{  
             "s3SchemaVersion":"1.0",
             "configurationId":"ID found in the bucket notification configuration",
-            "bucket":{  
-               "name":"bucket-name",
+            "bucket":{
+               "name":"change the bucket name to your test/dev bucket name",
                "ownerIdentity":{  
                   "principalId":"Amazon-customer-ID-of-the-bucket-owner"
                },
                "arn":"bucket-ARN"
             },
             "object":{  
-               "key":"object-key",
+               "key":"change the object key to your test/dev object",
                "size": 128,
                "eTag":"object eTag",
                "versionId":"object version if bucket is versioning-enabled, otherwise null",
