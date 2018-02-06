@@ -1,17 +1,11 @@
 'use strict';
 
-var handleS3Error = require('./helpers/errors').handleS3Error
-var resize = require('./helpers/resizer').resize
+const handleS3Error = require('./helpers/errors').handleS3Error
+const resize = require('./helpers/resizer').resize
 
-var AWS = require('aws-sdk');
+const AWS = require('aws-sdk');
 
 module.exports.onUpload = (event, context, callback) => {
-  var dstBucket = process.env.DST_BUCKET_NAME;
-
-  var s3 = new AWS.S3({
-    accessKeyId: process.env.S3_ACCESS_KEY_ID,
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
-  })
 
   //** event.body is used for debugging in sls offline 
   //** event is a string when debugging using postman
@@ -25,13 +19,19 @@ console.log("srcS3", srcS3)
 
   const srcParams = {
     Bucket: srcBucket,
-    Key: srcKey
+    Key: unescape(srcKey)
   }
+
+  const s3 = new AWS.S3({
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+  })
 
   s3.getObject(srcParams)
   .promise()
   .then(function(data) {
 
+    const dstBucket = process.env.DST_BUCKET_NAME;
     const widths = [320, 400, 768, 1200]
 
     widths.forEach(function(width) {
@@ -75,13 +75,6 @@ console.log("srcS3", srcS3)
 };
 
 module.exports.onRRSObjectLost = (event, context, callback) => {
-  
-  const srcBucket = process.env.SRC_BUCKET_NAME;
-
-  const s3 = new AWS.S3({
-    accessKeyId: process.env.S3_ACCESS_KEY_ID,
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
-  })
 
   //** event.body is used for debugging in sls offline 
   //** event is a string when debugging using postman
@@ -96,10 +89,17 @@ console.log("record", record)
 
   const srcKey = key.replace(/\_[0-9]+\..*$/i, `.${extension}`)
 
+  const srcBucket = process.env.SRC_BUCKET_NAME;
+
   const srcParams = {
     Bucket: srcBucket,
-    Key: srcKey
+    Key: unescape(srcKey)
   }
+
+  const s3 = new AWS.S3({
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+  })
 
   s3.getObject(srcParams)
   .promise()
