@@ -19,6 +19,7 @@ module.exports.onUpload = (event, context, callback) => {
   
   // const srcS3 = JSON.parse(event.body).Records[0].s3 // for dev in sls offline
   const srcS3 = event.Records[0].s3 // in production with S3 event as input
+console.log("srcS3", srcS3)
   const srcBucket = srcS3.bucket.name
   const srcKey = srcS3.object.key
 
@@ -88,6 +89,7 @@ module.exports.onRRSObjectLost = (event, context, callback) => {
   
   // const record = JSON.parse(event.body).Records[0] // for dev in sls offline
   const record = event.Records[0] // in production with S3 event as input
+console.log("record", record)
   const extension = key.split(".").pop()
 
   const width = parseInt(key.split("_").pop().split(".").shift())
