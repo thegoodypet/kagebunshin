@@ -21,6 +21,7 @@ provider:
   timeout: ${self:custom.provider.timeout}
   environment:
     DST_BUCKET_NAME: ${self:custom.s3.${opt:stage, 'dev'}DstBucketName}
+    SRC_BUCKET_NAME: ${self:custom.s3.${opt:stage, 'dev'}SrcBucketName}
     S3_ACCESS_KEY_ID: ${self:custom.s3.${opt:stage, 'dev'}AccessKeyId}
     S3_SECRET_ACCESS_KEY: ${self:custom.s3.${opt:stage, 'dev'}SecretAccessKey}
 
@@ -34,6 +35,17 @@ functions:
     # events:
     #   - http:
     #       path: '/onUpload'
+    #       method: post
+    #       cors: true
+  onRRSObjectLost:
+    handler: handler.onRRSObjectLost
+    tags:
+      Name: ${self:custom.provider.awsTagName}
+    ## only use events for testing on dev and local
+    ## in production this lambda should be used as a event listener on S3 bucket
+    # events:
+    #   - http:
+    #       path: '/onRRSObjectLost'
     #       method: post
     #       cors: true
 
