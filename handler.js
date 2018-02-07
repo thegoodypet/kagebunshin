@@ -82,7 +82,9 @@ module.exports.onRRSObjectLost = (event, context, callback) => {
   
   // const record = JSON.parse(event.body).Records[0] // for dev in sls offline
   const record = event.Records[0] // in production with S3 event as input
+  const key = record.s3.object.key
 console.log("record", record)
+  
   const extension = key.split(".").pop()
 
   const width = parseInt(key.split("_").pop().split(".").shift())
@@ -107,10 +109,8 @@ console.log("record", record)
     resize(data.Body, width, function(err, buffer) {
       if (err) return callback(null, handleS3Error(err));
 
-      const bucketName = record.s3.bucket.name
-      const key = record.s3.object.key
       const dstParams = {
-        Bucket: bucketName,
+        Bucket: record.s3.bucket.name,
         Key: key,
         Body: buffer,
         StorageClass: "REDUCED_REDUNDANCY",
