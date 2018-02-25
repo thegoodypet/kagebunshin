@@ -37,17 +37,6 @@ functions:
     #       path: '/onUpload'
     #       method: post
     #       cors: true
-  onRRSObjectLost:
-    handler: handler.onRRSObjectLost
-    tags:
-      Name: ${self:custom.provider.awsTagName}
-    ## only use events for testing on dev and local
-    ## in production this lambda should be used as a event listener on S3 bucket
-    # events:
-    #   - http:
-    #       path: '/onRRSObjectLost'
-    #       method: post
-    #       cors: true
 
 plugins:
   - serverless-offline

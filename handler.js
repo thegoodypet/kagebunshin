@@ -45,7 +45,6 @@ console.log("srcS3", srcS3)
           Bucket: dstBucket,
           Key: dstKey,
           Body: buffer,
-          StorageClass: "REDUCED_REDUNDANCY",
           ACL: "public-read",
           ContentType: data.ContentType
         }
@@ -72,70 +71,4 @@ console.log("srcS3", srcS3)
 
   // Use this code if you don't use the http event with the LAMBDA-PROXY integration
   // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
-};
-
-module.exports.onRRSObjectLost = (event, context, callback) => {
-
-  //** event.body is used for debugging in sls offline 
-  //** event is a string when debugging using postman
-  //** event is a JSON when triggered by an S3 event
-  
-  // const record = JSON.parse(event.body).Records[0] // for dev in sls offline
-  const record = event.Records[0] // in production with S3 event as input
-  const key = record.s3.object.key
-console.log("record", record)
-  
-  const extension = key.split(".").pop()
-
-  const width = parseInt(key.split("_").pop().split(".").shift())
-
-  const srcKey = key.replace(/\_[0-9]+\..*$/i, `.${extension}`)
-
-  const srcBucket = process.env.SRC_BUCKET_NAME;
-
-  const srcParams = {
-    Bucket: srcBucket,
-    Key: unescape(srcKey)
-  }
-
-  const s3 = new AWS.S3({
-    accessKeyId: process.env.S3_ACCESS_KEY_ID,
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
-  })
-
-  s3.getObject(srcParams)
-  .promise()
-  .then(function(data) {
-    resize(data.Body, width, function(err, buffer) {
-      if (err) return callback(null, handleS3Error(err));
-
-      const dstParams = {
-        Bucket: record.s3.bucket.name,
-        Key: key,
-        Body: buffer,
-        StorageClass: "REDUCED_REDUNDANCY",
-        ACL: "public-read",
-        ContentType: data.ContentType
-      }
-
-      s3.upload(dstParams)
-      .promise()
-      .then(function(data) {
-        const response = {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: data,
-          }),
-        };
-
-        callback(null, response);
-      })
-      .catch(function(err) {
-        callback(null, handleS3Error(err))
-      })
-    })
-  })
-  .catch(function(err) {
-    callback(null, handleS3Error(err))
-  })
 };
