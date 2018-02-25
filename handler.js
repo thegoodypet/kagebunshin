@@ -32,7 +32,7 @@ console.log("srcS3", srcS3)
   .then(function(data) {
 
     const dstBucket = process.env.DST_BUCKET_NAME;
-    const widths = [320, 400, 768, 1200]
+    const widths = [400, 768, 1200]
 
     widths.forEach(function(width) {
 
