@@ -31,9 +31,22 @@ console.log("srcS3", srcS3)
   .promise()
   .then(function(data) {
 
-    const dstBucket = process.env.DST_BUCKET_NAME;
-    const widths = [400, 768, 1200]
+    const dstBucket = process.env.DST_BUCKET_NAME
+    // copy original
+    let dstParams = {
+      Bucket: dstBucket,
+      Key: srcKey,
+      ACL: "public-read",
+      Body: data.Body
+    }
+    s3.putObject(dstParams)
+    .promise()
+    .catch(function(err) {
+      callback(null, handleS3Error(err))
+    })
 
+    // resize and upload the rest
+    const widths = [400, 768, 1200]
     widths.forEach(function(width) {
 
       resize(data.Body, width, function(err, buffer) {
