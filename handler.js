@@ -37,7 +37,8 @@ console.log("srcS3", srcS3)
       Bucket: dstBucket,
       Key: srcKey,
       ACL: "public-read",
-      Body: data.Body
+      Body: data.Body,
+      CacheControl: "public, max-age=604800"
     }
     s3.putObject(dstParams)
     .promise()
@@ -59,7 +60,8 @@ console.log("srcS3", srcS3)
           Key: dstKey,
           Body: buffer,
           ACL: "public-read",
-          ContentType: data.ContentType
+          ContentType: data.ContentType,
+          CacheControl: "public, max-age=604800"
         }
 
         s3.upload(dstParams)
